@@ -4,6 +4,11 @@ const postRouter = express.Router();
 
 const postController = require("../controllers/post.controller");
 
-postRouter.post("/",postController.createPostController);
+const multer = require("multer");
+
+const upload = multer({storage:multer.memoryStorage()});
+
+
+postRouter.post("/",upload.single("image"),postController.createPostController);
 
 module.exports = postRouter;
