@@ -14,3 +14,19 @@
   ==> follow
   ==> follower/following
     
+
+
+    post Schema = {
+         caption: String,
+         img_url : String,
+         user:userId,
+         createdAt:Date-time
+    }
+
+    user Schema = {
+      username:String, unique , required
+      password:string, required
+      profileImage:String,
+      email:String , unique , required
+      bio:string
+    }
