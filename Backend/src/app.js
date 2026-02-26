@@ -1,20 +1,17 @@
 const express = require("express");
-
-const app = express();
-
-app.use(express.json());   // this middleware can read the data of req.body only if it is in raw 
-
 const cookieParser = require("cookie-parser");
-
+const app = express();
+app.use(express.json());   /* this middleware can read the data of req.body only if it is in raw*/
 app.use(cookieParser());
 
+/* require routes */
 const authRouter = require("./routes/auth.routes");
-
-app.use("/api/auth",authRouter);
-
 const postRouter = require("./routes/post.routes");
+const userRouter = require("./routes/user.routes");
 
-app.use("/api/posts",postRouter);
+/* using routes */
+app.use("/api/auth", authRouter);
+app.use("/api/posts", postRouter);
+app.use("/api/users", userRouter);
 
 module.exports = app;
-
