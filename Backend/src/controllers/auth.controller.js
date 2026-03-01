@@ -4,6 +4,12 @@ const bcrypt = require("bcryptjs");
 
 const jwt = require("jsonwebtoken");
 
+/**
+ *  @route /api/auth/register  
+ * @ddescription register user 
+ * @access Public
+ */
+
 async function registerController(req, res) {
   const { username, email, password, bio, profileImage } = req.body;
 
@@ -31,6 +37,7 @@ async function registerController(req, res) {
   const token = jwt.sign(
     {
       id: user._id,
+      username:user.username,
     },
     process.env.JWT_SECRET,
     { expiresIn: "1d" },
@@ -49,6 +56,11 @@ async function registerController(req, res) {
     token,
   });
 }
+/**
+ * @route POST /api/auth/login
+ * @description login user again
+ * @access Private
+ */
 
 async function loginController(req, res) {
   const { username, email, password } = req.body;
@@ -80,6 +92,7 @@ async function loginController(req, res) {
   const token = jwt.sign(
     {
       id: user._id,
+      username:user.username
     },
     process.env.JWT_SECRET,
     { expiresIn: "1d" },

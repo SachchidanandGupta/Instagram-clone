@@ -1,17 +1,22 @@
 const mongoose = require("mongoose");
 const followSchema = new mongoose.Schema({
     follower:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:"user",
-        required:[true,"follower id is required"]
+       type:String,
     },
     followee:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:"user",
-        required:[true,"followee id is required"]
+        type:String,
+    },
+    status:{
+        type:String,
+        default:"pending",
+        enum:{
+            values:["pending","accepted","rejected"],
+            message:"status can only be pending,accepted or rejected"
+        } 
     }
 },{
     timestamps :true        // timestamp true means the time at which the document is created..
 });
+followSchema.index({follower:1,followee:1},{unique:true})
 const followModel = mongoose.model('follows',followSchema);
 module.exports = followModel; 
