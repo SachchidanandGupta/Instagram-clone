@@ -21,5 +21,17 @@ userRouter.post("/follow/:username",identifyUser, userController.followUserContr
  */
 userRouter.post("/unfollow/:username",identifyUser,userController.unFollowUserController);
 
+/**
+ * @route /api/user/follow/status/:username
+ * @description checcks the follow status
+ */
+userRouter.post("/follow-request/:username",identifyUser,userController.followRequestController);
+
+userRouter.get("/follow-request",identifyUser,userController.getRequestController);
+
+userRouter.post("/follow-request/accept",identifyUser,userController.acceptRequestController);
+
+userRouter.post("/follow-request/rejected",identifyUser,userController.declineRequestController);
+
 
 module.exports = userRouter;

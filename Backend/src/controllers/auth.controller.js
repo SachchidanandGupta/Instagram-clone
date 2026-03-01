@@ -9,7 +9,6 @@ const jwt = require("jsonwebtoken");
  * @ddescription register user 
  * @access Public
  */
-
 async function registerController(req, res) {
   const { username, email, password, bio, profileImage } = req.body;
 
@@ -56,12 +55,13 @@ async function registerController(req, res) {
     token,
   });
 }
+
+
 /**
  * @route POST /api/auth/login
  * @description login user again
  * @access Private
  */
-
 async function loginController(req, res) {
   const { username, email, password } = req.body;
 
