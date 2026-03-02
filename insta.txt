@@ -30,3 +30,8 @@
       email:String , unique , required
       bio:string
     }
+
+
+    Frontend
+     /login :- login from 
+     /register :- register form 
