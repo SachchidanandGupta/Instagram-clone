@@ -123,7 +123,8 @@ async function getMeController(req, res) {
       user:{
         username : user.username,
          email :user.email,
-         bio : user.bio 
+         bio : user.bio ,
+         profileImage : user.profileImage
       }
     })
 }
