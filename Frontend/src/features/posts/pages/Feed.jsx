@@ -1,9 +1,16 @@
-import React from 'react'
-
+import React from "react";
+import "../styles/feed.scss";
+import Post from "../components/Post";
 const Feed = () => {
   return (
-    <div>Feed</div>
-  )
-}
+    <main className="feed-page">
+      <div className="Feed">
+        <div className="posts">
+          {/* <Post/> */}
+        </div>
+      </div>
+    </main>
+  );
+};
 
-export default Feed
+export default Feed;
