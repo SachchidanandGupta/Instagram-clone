@@ -10,24 +10,24 @@ const imageKit = new ImageKit({
 });
 
 /**
- * multer uses two types of storage disk and memory storage the disk storage means the files are being saved locally(on server)  
+ * multer uses two types of storage disk and memory storage the disk storage means the files are being saved locally(on server)
  * so we use memory storage most of the time which stores data in RAM and is temporary
  */
 
 /**
- * @route /api/posts/ 
+ * @route /api/posts/
  * @description Image upload on imagekit.io
  * @access private
- * 
+ *
  */
 async function createPostController(req, res) {
- console.log(req.file);
+  console.log(req.file);
   const file = await imageKit.files.upload({
     file: await toFile(Buffer.from(req.file.buffer), "file"),
     fileName: "test",
     folder: "Cohort-2-Insta-posts",
   });
-  
+
   const post = await postModel.create({
     caption: req.body.caption,
     imgUrl: file.url,
@@ -40,13 +40,11 @@ async function createPostController(req, res) {
 }
 
 /**
- * @route GET -->  /api/posts/   
+ * @route GET -->  /api/posts/
  * @description get post data
  * @access Public
  */
 async function getPostController(req, res) {
- 
-
   const userId = req.user.id;
   const posts = await postModel.find({
     user: userId,
@@ -64,8 +62,6 @@ async function getPostController(req, res) {
  * @access private
  */
 async function getPostDetailsController(req, res) {
- 
-
   const userId = req.user.id;
 
   const postId = req.params.postId;
@@ -91,53 +87,69 @@ async function getPostDetailsController(req, res) {
   });
 }
 
-
 /**
  * @route POST /api/posts/like?:postId
  * @description to lke a post
  */
-async function likePostController(req,res){
-    const postId = req.params.postId;
-    const likedUser = req.user.username;
-    console.log(postId,likedUser);
+async function likePostController(req, res) {
+  const postId = req.params.postId;
+  const likedUser = req.user.username;
+  console.log(postId, likedUser);
 
-    const isAlreadyLiked = await likeModel.findOne({
-      postLiked:postId,
-      likedBy:likedUser
+  const isAlreadyLiked = await likeModel.findOne({
+    postLiked: postId,
+    likedBy: likedUser,
+  });
+  if (isAlreadyLiked) {
+    return res.status(200).json({
+      message: `the post is already liked by ${likedUser}`,
+      isAlreadyLiked,
     });
-    if(isAlreadyLiked){
-      return res.status(200).json({
-        message:`the post is already liked by ${likedUser}`,
-        isAlreadyLiked
-      })
-    }
-    const isPostExists = await postModel.findById(postId);
-    if(!isPostExists){
-      return res.status(404).json({
-        message:"Post  not founded."
-      })
-    }
-    const like = await likeModel.create({
-        postLiked:postId,
-        likedBy : likedUser 
+  }
+  const isPostExists = await postModel.findById(postId);
+  if (!isPostExists) {
+    return res.status(404).json({
+      message: "Post  not founded.",
     });
-    res.status(201).json({
-        message:`the post is liked by ${likedUser}`,
-        like
-    })
+  }
+  const like = await likeModel.create({
+    postLiked: postId,
+    likedBy: likedUser,
+  });
+  res.status(201).json({
+    message: `the post is liked by ${likedUser}`,
+    like,
+  });
 }
 
-async function getFeedController(req,res){
-   const posts = await postModel.find().populate("user");
-   res.status(200).json({
-    message:"Posts fetched successfully",
-    posts
-   })
+async function getFeedController(req, res) {
+  const user = req.user;
+  const posts = await Promise.all(
+    (await postModel.find().populate("user").lean()).map(async (post) => {
+      /**
+       * typeof post = mongoose object :- the data is readed into mongoose object and a new property can't be added into it
+       * to change them into regular object we use lean function
+       */
+      
+      const isLiked = await likeModel.findOne({
+        postLiked: post._id,
+        likedBy: user.username,
+      });
+      
+      post.isLiked = !!isLiked; // Convert to boolean: true if liked, false otherwise
+      return post;
+    }),
+  );
+  // promise all will resolve all the promises which has been sent into pending by map function
+  res.status(200).json({
+    message: "Posts fetched successfully",
+    posts,
+  });
 }
 module.exports = {
   createPostController,
   getPostController,
   getPostDetailsController,
   likePostController,
-  getFeedController
+  getFeedController,
 };
