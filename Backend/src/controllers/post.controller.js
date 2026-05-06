@@ -122,13 +122,31 @@ async function likePostController(req, res) {
   });
 }
 
+async function unLikePostController(req,res){
+  const postId = req.params.postId;
+  const username = req.user.username;
+  const isLIked = await likeModel.findOne({
+     postLiked:postId,
+     likedBy:username
+  })
+  if(!isLIked){
+    return res.status(400).json({
+      message: `the post isn't liked by${username}`
+    })
+  }
+  await likeModel.findOneAndDelete({_id:isLiked._id});
+  return res.status(200).json({
+    message:"Post unliked successfully"
+  })
+}
 async function getFeedController(req, res) {
   const user = req.user;
   const posts = await Promise.all(
-    (await postModel.find().populate("user").lean()).map(async (post) => {
+    (await postModel.find().sort({_id:-1}).populate("user").lean()).map(async (post) => {
       /**
        * typeof post = mongoose object :- the data is readed into mongoose object and a new property can't be added into it
        * to change them into regular object we use lean function
+       * sort({_id:-1}) is used to return the data on frontend on the time basis the post created at the moment will show at the top
        */
       
       const isLiked = await likeModel.findOne({
@@ -151,5 +169,6 @@ module.exports = {
   getPostController,
   getPostDetailsController,
   likePostController,
+  unLikePostController,
   getFeedController,
 };
